@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 
 const router = express.Router();
 router.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
@@ -32,8 +32,12 @@ router.post('/', async (req, res) => {
 
 // tests
 router.post('/question', async (req, res) => {
-    exam.createQuestion(req.body);
-    res.send("ok");
+    exam.createQuestion(req.body)
+        .then(data => res.status(200).send(data))
+        .catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        });
 });
 
 
