@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
 
 // tests
 router.post('/question', async (req, res) => {
-    exam.createQuestion(req.body)
+    exam.addQuestion(req.body)
         .then(data => res.status(200).send(data))
         .catch(err => {
             console.log(err)
