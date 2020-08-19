@@ -15,7 +15,7 @@ function getData(query, model) {
     return new Promise(async (resolve, reject) => {
         await model.find({ ...query }, (err, res) => {
             if (res[0]) {
-                resolve({ data: res[0].toJSON(), success: true, error: err });
+                resolve({ data: res, success: true, error: err });
             } else {
                 resolve({ message: "No data found!", data: {}, success: false, error: err });
             }

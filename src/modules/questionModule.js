@@ -29,7 +29,7 @@ function createQuestion(data) {
 
     return new Promise((resolve, reject) => {
         // check if files are present
-        if (data.fileList !== undefined && typeof data.fileList == "array" && data.fileList.length > 0) {
+        if (data.fileList !== undefined && typeof data.fileList == "object" && data.fileList.length > 0) {
             let copyData = { ...data };
 
             copyData = JSON.stringify(deleteImageFromReq(copyData));
@@ -164,4 +164,15 @@ function deleteImageFromReq(data) {
 /* Create Question End */
 
 
+/* get question start */
+
+function getQuestion(data){
+    return db.getData(data, Question)
+    .then(res => res)
+    .catch(err => err);
+}
+
+/* get question end */
+
 module.exports.createQuestion = createQuestion;
+module.exports.getQuestion = getQuestion;
