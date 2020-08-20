@@ -66,6 +66,18 @@ function saveData(data, model) {
     });
 }
 
+function updateData(data, model) {
+    return new Promise(async (resolve, reject) => {
+        model.findOneAndUpdate({ _q_id: data._q_id }, data, { useFindAndModify: false, upsert: true }, function (err, res) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(res);
+            }
+        });
+    });
+}
+
 // close mongodb connection
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);
@@ -82,3 +94,4 @@ function cleanup() {
 module.exports.getData = getData;
 module.exports.saveData = saveData;
 module.exports.deleteData = deleteData;
+module.exports.updateData = updateData;

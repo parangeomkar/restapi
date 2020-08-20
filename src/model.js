@@ -23,6 +23,7 @@ var question_schema = new mongoose.Schema({
     _op_4: Object,
     _p_tol: Number,
     _n_tol: Number,
+    _has_file: Boolean,
     _num_ans: Number,
     _q_ans: Array,
     _date_created: Number,

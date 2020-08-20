@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const router = express.Router();
 router.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
@@ -52,6 +52,16 @@ router.get('/question', async (req, res) => {
 
 router.delete('/question', async (req, res) => {
     exam.deleteQuestion(req.body)
+        .then(data => res.status(200).send(data))
+        .catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        });
+});
+
+
+router.patch('/question', async (req, res) => {
+    exam.patchQuestion(req.body)
         .then(data => res.status(200).send(data))
         .catch(err => {
             console.log(err)

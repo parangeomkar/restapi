@@ -23,10 +23,10 @@ const buckets = [
 
 /* get question start */
 
-function getQuestion(data){
+function getQuestion(data) {
     return db.getData(data, Question)
-    .then(res => res)
-    .catch(err => err);
+        .then(res => res)
+        .catch(err => err);
 }
 
 /* get question end */
@@ -37,111 +37,167 @@ function getQuestion(data){
 
 /* get question start */
 
-function deleteQuestion(data){
+function deleteQuestion(data) {
     return db.deleteData(data, Question)
-    .then(res => res)
-    .catch(err => err);
+        .then(res => res)
+        .catch(err => err);
 }
 
 /* get question end */
 
 
-
-
-
-
 /* Create Question Start */
 function createQuestion(data) {
-    // number of uploaded files
-    let fileCount = 0;
-
     // set question id
     data._q_id = uuidv4();
+    return handleQuestionInsertUpdate(data);
+}
+/* Create Question End */
 
+
+/* Update Question Start */
+function patchQuestion(data) {
+    // set question id
+    data._q_id = uuidv4();
+    data.update = true;
+    return handleQuestionInsertUpdate(data);
+}
+/* Update Question End */
+
+function handleQuestionInsertUpdate(data) {
     return new Promise((resolve, reject) => {
+
         // check if files are present
         if (data.fileList !== undefined && typeof data.fileList == "object" && data.fileList.length > 0) {
-            let copyData = { ...data };
+            // check for tamperd data
+            if (!checkForTamper(data)) reject(new Error("Data tampered!"));
 
-            copyData = JSON.stringify(deleteImageFromReq(copyData));
-
-            // check if files to upload is greater than 5
-            if (data.fileList.length > 5) {
-                reject(new Error("You are not allowed to do that!"));
-            }
-
-            // iterate file list to check for request tamper
-            data.fileList.forEach((key) => {
-                // reject if custom key is injected
-                if (key !== "_q_image" && key !== "_op_1_image" && key !== "_op_2_image" && key !== "_op_3_image" && key !== "_op_4_image") {
-                    reject(new Error("File data tampered!"));
-                    delete data.fileList;
+            uploadAndAddQuestion(data).then(data2 => {
+                // save to db after uploading all files
+                console.log("Saving question with file");
+                data2._has_file = true;
+                if (data.upload) {
+                    updateQuestion(data2)
+                        .then(res => resolve(res))
+                        .catch(err => reject(err));
+                } else {
+                    saveQuestion(data2)
+                        .then(res => resolve(res))
+                        .catch(err => reject(err));
                 }
+            }).catch(err => reject(err));
 
-                // reject if key is present without file
-                if (!data[key] || data[key] == "" || data[key] == null || data[key] == undefined) {
-                    reject(new Error("File count is not equal to files!"));
-                    delete data.fileList;
-                }
-
-                // reject if image url placeholder is missing
-                if (copyData.indexOf("$$" + key + "$$") == -1) {
-                    reject(new Error("File names tampered!"));
-                    delete data.fileList;
-                }
-            });
-
-            // check if still files are present
-            if (data.fileList != undefined) {
-                const fileName = data._q_id;
-                let fileArray = {};
-
-                // iterate file list and upload to GCP
-                data.fileList.forEach(async (key) => {
-
-                    count++;
-                    if (count > (buckets.length - 1)) count = 0;
-
-                    // store current count to be used inside then()
-                    fileArray[key] = count;
-
-                    await gcsApi.uploadToGCS(data[key], fileName + key + ".jpg", buckets[count][0], buckets[count][1])
-                        .then(res => {
-                            const c = fileArray[key];
-
-                            // replace image placeholder with url
-                            data = JSON.stringify(data);
-                            data = JSON.parse(data.replace('$$' + key + '$$', buckets[c][2] + fileName + key + ".jpg"));
-                            fileCount++;
-
-                            // check if all images have been uploaded
-                            if (fileCount == data.fileList.length) {
-                                // save to db after uploading all files
-                                console.log("Saving question with file");
-                                saveQuestion(data)
-                                    .then(res => resolve(res))
-                                    .catch(err => reject(err));
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            reject(err);
-                        });
-                });
-            } else {
-                // reject if request is tampered
-                reject("File count is not equal to files. Could not save!");
-            }
         } else {
             // save to db if there are no files
             console.log("Saving question without file");
-            saveQuestion(data)
-                .then(res => resolve(res))
-                .catch(err => reject(err));
+            data._has_file = false;
+            if (data.upload) {
+                updateQuestion(data2)
+                    .then(res => resolve(res))
+                    .catch(err => reject(err));
+            } else {
+                saveQuestion(data2)
+                    .then(res => resolve(res))
+                    .catch(err => reject(err));
+            }
         }
     });
 }
 
+
+function checkForTamper(data) {
+    let notTempered = true;
+    let copyData = { ...data };
+
+    copyData = JSON.stringify(deleteImageFromReq(copyData));
+
+    // check if files to upload is greater than 5
+    if (data.fileList.length > 5) {
+        console.log("You are not allowed to do that!")
+        return false;
+        // reject(new Error("You are not allowed to do that!"));
+    }
+
+    // iterate file list to check for request tamper
+    data.fileList.forEach((key) => {
+        // reject if custom key is injected
+        if (key !== "_q_image" && key !== "_op_1_image" && key !== "_op_2_image" && key !== "_op_3_image" && key !== "_op_4_image") {
+            console.log("File data tampered!")
+            notTempered = false;
+            // reject(new Error("File data tampered!"));
+            // delete data.fileList;
+        }
+
+        // reject if key is present without file
+        if (!data[key] || data[key] == "" || data[key] == null || data[key] == undefined) {
+            console.log("File count is not equal to files!")
+            notTempered = false;
+            // reject(new Error("File count is not equal to files!"));
+            // delete data.fileList;
+        }
+
+        // reject if image url placeholder is missing
+        if (copyData.indexOf("$$" + key + "$$") == -1) {
+            console.log("File names tampered!")
+            notTempered = false;
+            // reject(new Error("File names tampered!"));
+            // delete data.fileList;
+        }
+    });
+
+    return notTempered;
+}
+
+function uploadAndAddQuestion(data) {
+    // number of uploaded files
+    let fileCount = 0;
+
+    const fileName = data._q_id;
+    let fileArray = {};
+
+    return new Promise((resolve, reject) => {
+
+        // iterate file list and upload to GCP
+        data.fileList.forEach(async (key) => {
+            count++;
+            if (count > (buckets.length - 1)) count = 0;
+
+            // store current count to be used inside then()
+            fileArray[key] = count;
+
+
+            await gcsApi.uploadToGCS(data[key], fileName + key + ".jpg", buckets[count][0], buckets[count][1])
+                .then(res => {
+                    const c = fileArray[key];
+
+                    // replace image placeholder with url
+                    data = JSON.stringify(data);
+                    data = JSON.parse(data.replace('$$' + key + '$$', buckets[c][2] + fileName + key + ".jpg"));
+                    fileCount++;
+
+                    // check if all images have been uploaded
+                    if (fileCount == data.fileList.length) {
+                        resolve(data)
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    reject(err);
+                });
+        });
+    });
+}
+
+
+// save question in database
+function patchQuestion(data) {
+    // sanitize unwanted data
+    data = sanitizeData(data);
+
+    return db.updateData(data, Question)
+        .then(res => res)
+        .catch(err => err);
+}
 
 // save question in database
 function saveQuestion(data) {
@@ -157,7 +213,7 @@ function saveQuestion(data) {
 function sanitizeData(data) {
 
     // allowed keys
-    let validKeys = ['_q_id', '_q_type', '_p_marks', '_n_marks', '_q', '_op_1', '_op_2', '_op_3', '_op_4', '_p_tol', '_n_tol', '_num_ans', '_q_ans'];
+    let validKeys = ['_q_id', '_q_type', '_p_marks', '_n_marks', '_q', '_op_1', '_op_2', '_op_3', '_op_4', '_p_tol', '_n_tol', '_num_ans', '_q_ans', '_has_file'];
 
     // remove files and file list form question data
     data = deleteImageFromReq(data);
@@ -179,6 +235,7 @@ function sanitizeData(data) {
             });
         }
     });
+
     return data;
 }
 
@@ -192,8 +249,7 @@ function deleteImageFromReq(data) {
     return data;
 }
 
-/* Create Question End */
-
 module.exports.createQuestion = createQuestion;
+module.exports.patchQuestion = patchQuestion;
 module.exports.getQuestion = getQuestion;
 module.exports.deleteQuestion = deleteQuestion;
