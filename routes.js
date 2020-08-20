@@ -49,6 +49,16 @@ router.get('/question', async (req, res) => {
         });
 });
 
+
+router.delete('/question', async (req, res) => {
+    exam.deleteQuestion(req.body)
+        .then(data => res.status(200).send(data))
+        .catch(err => {
+            console.log(err)
+            res.status(400).send(err)
+        });
+});
+
 function verifyToken(req, res, next) {
     const bearerHeader = req.headers["authorization"];
     if (typeof bearerHeader !== 'undefined') {

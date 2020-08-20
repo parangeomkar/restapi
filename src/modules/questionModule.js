@@ -19,6 +19,37 @@ const buckets = [
 ]
 
 
+
+
+/* get question start */
+
+function getQuestion(data){
+    return db.getData(data, Question)
+    .then(res => res)
+    .catch(err => err);
+}
+
+/* get question end */
+
+
+
+
+
+/* get question start */
+
+function deleteQuestion(data){
+    return db.deleteData(data, Question)
+    .then(res => res)
+    .catch(err => err);
+}
+
+/* get question end */
+
+
+
+
+
+
 /* Create Question Start */
 function createQuestion(data) {
     // number of uploaded files
@@ -163,16 +194,6 @@ function deleteImageFromReq(data) {
 
 /* Create Question End */
 
-
-/* get question start */
-
-function getQuestion(data){
-    return db.getData(data, Question)
-    .then(res => res)
-    .catch(err => err);
-}
-
-/* get question end */
-
 module.exports.createQuestion = createQuestion;
 module.exports.getQuestion = getQuestion;
+module.exports.deleteQuestion = deleteQuestion;

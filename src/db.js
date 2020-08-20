@@ -27,6 +27,26 @@ function getData(query, model) {
 }
 
 
+
+function deleteData(query, model) {
+    return new Promise(async (resolve, reject) => {
+        if (!query._q_id) {
+            reject(new Error("Methodd not allowed!"));
+        }
+
+        await model.deleteOne({ _q_id: query._q_id }, (err, res) => {
+            if (res.deletedCount > 0) {
+                resolve({ message: "Successfuly deleted one record!", success: true, error: err });
+            } else {
+                resolve({ message: "No record to delete!", success: false, error: new Error("record not found") });
+            }
+        })
+            .catch(error => {
+                reject(new Error({ message: "Error Occuered!", error }));
+            });
+    });
+}
+
 function saveData(data, model) {
     return new Promise(async (resolve, reject) => {
         const instance = new model({
@@ -61,3 +81,4 @@ function cleanup() {
 // exports
 module.exports.getData = getData;
 module.exports.saveData = saveData;
+module.exports.deleteData = deleteData;

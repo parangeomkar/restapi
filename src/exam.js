@@ -13,5 +13,16 @@ async function getQuestion(data) {
 	}).catch(err => err);
 }
 
+
+async function deleteQuestion(data) {
+	return await questionModule.deleteQuestion(data).then(res => {
+		delete res._id;
+		delete res._v;
+		delete res._last_accessed;
+		return res
+	}).catch(err => err);
+}
+
 module.exports.addQuestion = addQuestion;
 module.exports.getQuestion = getQuestion;
+module.exports.deleteQuestion = deleteQuestion;
