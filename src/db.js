@@ -14,10 +14,10 @@ mongoose.connect(uri, {
 function getData(query, model) {
     return new Promise(async (resolve, reject) => {
         await model.find({ ...query }, (err, res) => {
-            if (res[0]) {
+            if (res && res[0]) {
                 resolve({ data: res, success: true, error: err });
             } else {
-                resolve({ message: "No data found!", data: {}, success: false, error: err });
+                resolve({ message: "No data found!", data: [], success: false, error: err });
             }
         })
             .catch(error => {
@@ -68,6 +68,9 @@ function saveData(data, model) {
 
 function updateData(data, model) {
     return new Promise(async (resolve, reject) => {
+        data._last_accessed = Date.now();
+        delete data._id;
+
         model.findOneAndUpdate({ _q_id: data._q_id }, data, { useFindAndModify: false, upsert: true }, function (err, res) {
             if (err) {
                 reject(err);

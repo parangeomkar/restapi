@@ -24,6 +24,7 @@ const buckets = [
 /* get question start */
 
 function getQuestion(data) {
+    data = data._q_id ? { _q_id: data._q_id } : {};
     return db.getData(data, Question)
         .then(res => res)
         .catch(err => err);
@@ -58,7 +59,6 @@ function createQuestion(data) {
 /* Update Question Start */
 function patchQuestion(data) {
     // set question id
-    data._q_id = uuidv4();
     data.update = true;
     return handleQuestionInsertUpdate(data);
 }
@@ -76,7 +76,7 @@ function handleQuestionInsertUpdate(data) {
                 // save to db after uploading all files
                 console.log("Saving question with file");
                 data2._has_file = true;
-                if (data.upload) {
+                if (data2.update) {
                     updateQuestion(data2)
                         .then(res => resolve(res))
                         .catch(err => reject(err));
@@ -90,13 +90,14 @@ function handleQuestionInsertUpdate(data) {
         } else {
             // save to db if there are no files
             console.log("Saving question without file");
+
             data._has_file = false;
-            if (data.upload) {
-                updateQuestion(data2)
+            if (data.update) {
+                updateQuestion(data)
                     .then(res => resolve(res))
                     .catch(err => reject(err));
             } else {
-                saveQuestion(data2)
+                saveQuestion(data)
                     .then(res => resolve(res))
                     .catch(err => reject(err));
             }
@@ -190,7 +191,7 @@ function uploadAndAddQuestion(data) {
 
 
 // save question in database
-function patchQuestion(data) {
+function updateQuestion(data) {
     // sanitize unwanted data
     data = sanitizeData(data);
 
@@ -213,7 +214,7 @@ function saveQuestion(data) {
 function sanitizeData(data) {
 
     // allowed keys
-    let validKeys = ['_q_id', '_q_type', '_p_marks', '_n_marks', '_q', '_op_1', '_op_2', '_op_3', '_op_4', '_p_tol', '_n_tol', '_num_ans', '_q_ans', '_has_file'];
+    let validKeys = ['_q_id', '_q_type', '_q_cat', '_p_marks', '_n_marks', '_q', '_op_1', '_op_2', '_op_3', '_op_4', '_p_tol', '_n_tol', '_num_ans', '_q_ans', '_has_file', '_date_created', '_last_accessed'];
 
     // remove files and file list form question data
     data = deleteImageFromReq(data);
@@ -221,7 +222,7 @@ function sanitizeData(data) {
     //check for base64 injection
     Object.keys(data).forEach((key) => {
         // validate keys against allowed keys
-        if (data[key] == null || data[key] === "" || validKeys.indexOf(key) == -1) {
+        if (data[key] == null || data[key] === "" || validKeys.indexOf(key) == -1 || (typeof data == "object" && Object.keys(data).length == 0)) {
             delete data[key];
             return;
         }

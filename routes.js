@@ -42,7 +42,13 @@ router.post('/question', async (req, res) => {
 
 router.get('/question', async (req, res) => {
     exam.getQuestion(req.query)
-        .then(data => res.status(200).send(data))
+        .then(data => {
+            if(data.success){
+                res.status(200).send(data)
+            } else {
+                res.status(404).send(data)
+            }
+        })
         .catch(err => {
             console.log(err)
             res.status(400).send(err)
