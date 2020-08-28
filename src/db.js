@@ -17,7 +17,7 @@ function getData(query, model) {
             if (res && res[0]) {
                 resolve({ data: res, success: true, error: err });
             } else {
-                resolve({ message: "No data found!", data: [], success: false, error: err });
+                resolve({ message: "No data found!", success: true, error: err });
             }
         })
             .catch(error => {

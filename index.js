@@ -13,7 +13,7 @@ app.use((err, req, res, next) => {
 
 
 //start server
-const PORT = process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080;
+const PORT = process.env.PORT || 4000;
 const server = app.listen(PORT, function () {
 	const host = server.address().address
 	const port = server.address().port

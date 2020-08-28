@@ -33,20 +33,6 @@ function getQuestion(data) {
 /* get question end */
 
 
-
-
-
-/* get question start */
-
-function deleteQuestion(data) {
-    return db.deleteData(data, Question)
-        .then(res => res)
-        .catch(err => err);
-}
-
-/* get question end */
-
-
 /* Create Question Start */
 function createQuestion(data) {
     // set question id
@@ -63,6 +49,19 @@ function patchQuestion(data) {
     return handleQuestionInsertUpdate(data);
 }
 /* Update Question End */
+
+
+/* delete question start */
+
+function deleteQuestion(data) {
+    return db.deleteData(data, Question)
+        .then(res => res)
+        .catch(err => err);
+}
+
+/* delete question end */
+
+
 
 function handleQuestionInsertUpdate(data) {
     return new Promise((resolve, reject) => {
