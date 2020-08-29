@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 
 var user_schema = new mongoose.Schema({
-    _user_id: String,
-    _user_pass: String,
-    _date_created: Number,
-    _is_deleted: Boolean,
-    _last_login: Boolean
+    _id: mongoose.Schema.Types.ObjectId,
+    _user_id: { type: String, required: true },
+    _user_email: { type: String, required: true },
+    _user_pass: { type: String, required: true },
+    _date_created: Number
 }, {
     collection: "clevertest_user"
 });
 
 var question_schema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
+    _item_author: String,
     _q_id: String,
     _q_type: { type: String, required: true },
     _q_cat: { type: String, required: true },

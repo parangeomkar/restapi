@@ -14,8 +14,8 @@ let count = 0;
 const buckets = [
     ["assets-8c595.appspot.com", "storage_a", "http://actugpeqip.cloudimg.io/v7/_static1_/"],
     ["staging.assets-8c595.appspot.com", "storage_a", "http://actugpeqip.cloudimg.io/v7/_static2_/"],
-    ["fourth-tiger-286019.appspot.com", "storage_b", "http://ahubrfchio.cloudimg.io/v7/_static3_/"],
-    ["staging.fourth-tiger-286019.appspot.com", "storage_b", "http://ahubrfchio.cloudimg.io/v7/_static4_/"],
+    // ["fourth-tiger-286019.appspot.com", "storage_b", "http://ahubrfchio.cloudimg.io/v7/_static3_/"],
+    // ["staging.fourth-tiger-286019.appspot.com", "storage_b", "http://ahubrfchio.cloudimg.io/v7/_static4_/"],
 ]
 
 
@@ -24,7 +24,7 @@ const buckets = [
 /* get question start */
 
 function getQuestion(data) {
-    data = data._q_id ? { _q_id: data._q_id } : {};
+    data = data._q_id ? { _q_id: data._q_id, _item_author: data._item_author } : { _item_author: data._item_author };
     return db.getData(data, Question)
         .then(res => res)
         .catch(err => err);
@@ -73,7 +73,7 @@ function handleQuestionInsertUpdate(data) {
 
             uploadAndAddQuestion(data).then(data2 => {
                 // save to db after uploading all files
-                console.log("Saving question with file");
+                console.trace("Saving question with file");
                 data2._has_file = true;
                 if (data2.update) {
                     updateQuestion(data2)
@@ -88,7 +88,7 @@ function handleQuestionInsertUpdate(data) {
 
         } else {
             // save to db if there are no files
-            console.log("Saving question without file");
+            console.trace("Saving question without file");
 
             data._has_file = false;
             if (data.update) {
@@ -113,35 +113,28 @@ function checkForTamper(data) {
 
     // check if files to upload is greater than 5
     if (data.fileList.length > 5) {
-        console.log("You are not allowed to do that!")
+        console.trace("You are not allowed to do that!")
         return false;
-        // reject(new Error("You are not allowed to do that!"));
     }
 
     // iterate file list to check for request tamper
     data.fileList.forEach((key) => {
         // reject if custom key is injected
         if (key !== "_q_image" && key !== "_op_1_image" && key !== "_op_2_image" && key !== "_op_3_image" && key !== "_op_4_image") {
-            console.log("File data tampered!")
+            console.trace("File data tampered!")
             notTempered = false;
-            // reject(new Error("File data tampered!"));
-            // delete data.fileList;
         }
 
         // reject if key is present without file
         if (!data[key] || data[key] == "" || data[key] == null || data[key] == undefined) {
-            console.log("File count is not equal to files!")
+            console.trace("File count is not equal to files!")
             notTempered = false;
-            // reject(new Error("File count is not equal to files!"));
-            // delete data.fileList;
         }
 
         // reject if image url placeholder is missing
         if (copyData.indexOf("$$" + key + "$$") == -1) {
-            console.log("File names tampered!")
+            console.trace("File names tampered!")
             notTempered = false;
-            // reject(new Error("File names tampered!"));
-            // delete data.fileList;
         }
     });
 
@@ -181,7 +174,7 @@ function uploadAndAddQuestion(data) {
                     }
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.trace(err);
                     reject(err);
                 });
         });
@@ -213,7 +206,7 @@ function saveQuestion(data) {
 function sanitizeData(data) {
 
     // allowed keys
-    let validKeys = ['_q_id', '_q_type', '_q_cat', '_p_marks', '_n_marks', '_q', '_op_1', '_op_2', '_op_3', '_op_4', '_p_tol', '_n_tol', '_num_ans', '_q_ans', '_has_file', '_date_created', '_last_accessed'];
+    let validKeys = ['_q_id', '_item_author', '_q_type', '_q_cat', '_p_marks', '_n_marks', '_q', '_op_1', '_op_2', '_op_3', '_op_4', '_p_tol', '_n_tol', '_num_ans', '_q_ans', '_has_file', '_date_created', '_last_accessed'];
 
     // remove files and file list form question data
     data = deleteImageFromReq(data);

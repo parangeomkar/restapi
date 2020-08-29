@@ -7,8 +7,8 @@ mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    console.log('MongoDB Connected...');
-}).catch(err => console.log(err));
+    console.trace('MongoDB Connected...');
+}).catch(err => console.trace(err));
 
 
 function getData(query, model) {
@@ -52,15 +52,14 @@ function saveData(data, model) {
         const instance = new model({
             _id: new mongoose.Types.ObjectId(),
             ...data,
-            _date_created: Date.now(),
-            _last_accessed: Date.now()
+            _date_created: Date.now()
         });
 
         try {
             const result = await instance.save();
             resolve(result);
         } catch (err) {
-            console.log(err);
+            console.trace(err);
             reject(err);
         }
     });
@@ -88,7 +87,7 @@ process.on('SIGTERM', cleanup);
 
 function cleanup() {
     mongoose.connection.close(function () {
-        console.log('Mongoose disconnected on app termination');
+        console.trace('Mongoose disconnected on app termination');
         process.exit(0);
     });
 };

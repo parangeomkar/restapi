@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 4000;
 const server = app.listen(PORT, function () {
 	const host = server.address().address
 	const port = server.address().port
-	console.log("App listening at", host, port)
+	console.trace("App listening at", host, port)
 });
 
 // default
