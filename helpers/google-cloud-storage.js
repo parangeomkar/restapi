@@ -3,12 +3,12 @@ var stream = require('stream');
 
 const storage_a = new Storage({
     projectId: "assets-8c595",
-    keyFilename: __dirname + "/assets-8c595-ff1b9c7a1af9.json"
+    keyFilename: __dirname + "/decrypted_asset1.json"
 })
 
 const storage_b = new Storage({
     projectId: "fourth-tiger-286019",
-    keyFilename: __dirname + "/fourth-tiger-286019-844feb8bf0db.json"
+    keyFilename: __dirname + "/decrypted_asset2.json"
 })
 
 

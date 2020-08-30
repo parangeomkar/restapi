@@ -2,10 +2,16 @@ const express = require('express');
 const question = require('./src/question.js');
 const auth = require('./src/auth.js');
 const bodyParser = require('body-parser');
-const validateToken = require('./middleware/validateToken');
 const cookieParser = require('cookie-parser');
-
 const router = express.Router();
+const gcsDecrypt = require('./helpers/gcs-decrypt');
+const validateToken = require('./middleware/validateToken');
+
+try {
+    gcsDecrypt();
+} catch (error) {
+    console.trace(error);
+}
 
 router.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:3000');
