@@ -56,7 +56,7 @@ function refreshToken(data) {
 		try {
 			const decoded = jwt.verify(data.refreshToken, "tsetrevelc-twj", null),
 				accessToken = jwt.sign({ uid: decoded.uid }, "tsetrevelc-twj-terces", { expiresIn: "1h" }),
-				localToken = jwt.sign({ uid: res.data[0]._user_id }, "tsetrevelc-twj-lacol", { expiresIn: "1h" }),
+				localToken = jwt.sign({ uid: decoded.uid }, "tsetrevelc-twj-lacol", { expiresIn: "1h" }),
 				refreshToken = data.refreshToken;
 			resolve({ accessToken, refreshToken, localToken });
 		} catch (error) {
