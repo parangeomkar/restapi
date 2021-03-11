@@ -1,8 +1,8 @@
 var express = require('express');
 const app = express();
-const routes = require('./routes.js');
+// const routes = require('./routes.js');
 
-app.use('/ct', routes);
+// app.use('/ct', routes);
 app.use((err, req, res, next) => {
 	res.status(500).json({
 		error: err,
@@ -13,7 +13,7 @@ app.use((err, req, res, next) => {
 
 
 //start server
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, function () {
 	const host = server.address().address
 	const port = server.address().port
@@ -22,5 +22,5 @@ const server = app.listen(PORT, function () {
 
 // default
 app.get('/', async (req, res) => {
-	res.send("Nothing is hereeeee!");
+	res.send("Hello world!");
 });

@@ -1,0 +1,17 @@
+application:
+  name: my-application
+  project: my-project
+  publicly_accessible: true
+  cpu: 1
+  ram: 1GB
+  port: 8080
+databases:
+- type: mongodb
+  version: "4.4"
+  name: my-db
+routers:
+- name: main
+  routes:
+  - application_name: my-application
+    paths:
+    - /
