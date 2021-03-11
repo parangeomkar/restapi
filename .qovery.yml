@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 application:
   name: my-application
   project: my-project
@@ -15,3 +16,25 @@ routers:
   - application_name: my-application
     paths:
     - /
+=======
+---
+application:
+  name: "restapi"
+  project: "test"
+  organization: "QoveryCommunity"
+  storage:
+  - name: "test"
+    size: "200"
+    type: "fast_ssd"
+    mount_point: "/mnt/test"
+databases:
+- type: "MONGODB"
+  name: "test"
+  version: "4.4"
+routers:
+- name: "main-restapi"
+  routes:
+  - application_name: "restapi"
+    paths:
+    - "/*"
+>>>>>>> 288dad434f416b916f2fe1511aa01e8295db54b5
