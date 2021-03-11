@@ -1,23 +1,20 @@
-<<<<<<< HEAD
+---
 application:
-  name: my-application
-  project: my-project
-  publicly_accessible: true
-  cpu: 1
-  ram: 1GB
-  port: 8080
+  name: "restapi"
+  project: "api"
+  organization: "QoveryCommunity"
   storage:
-  - name: "test"
-    size: "200"
-    type: "ssd"
-    mount_point: "/mnt/test"
+  - name: "assets"
+    size: "2000"
+    type: "hdd"
+    mount_point: "/mnt/assets"
 databases:
-- type: MONGODB
+- type: "MONGODB"
+  name: "ct"
   version: "4.4"
-  name: my-db
 routers:
-- name: main
+- name: "main-restapi"
   routes:
-  - application_name: my-application
+  - application_name: "restapi"
     paths:
-    - /
+    - "/*"
