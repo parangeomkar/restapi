@@ -1,0 +1,20 @@
+---
+application:
+  name: "restapi"
+  project: "api"
+  organization: "QoveryCommunity"
+  storage:
+  - name: "asset"
+    size: "2000"
+    type: "hdd"
+    mount_point: "/mnt/asset"
+databases:
+- type: "MONGODB"
+  name: "ct"
+  version: "4.4"
+routers:
+- name: "main-restapi"
+  routes:
+  - application_name: "restapi"
+    paths:
+    - "/*"
